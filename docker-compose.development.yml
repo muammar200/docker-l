@@ -1,0 +1,48 @@
+# image settings for containers
+services:
+  app:                                    # Define the "app" service (Laravel app)
+    build:                                # Instructions to build the Docker image
+      context: .                          # Use current directory as context
+      dockerfile: docker/php/Dockerfile  # Dockerfile location to build the image
+      args:                           # Build arguments to pass to Dockerfile
+        ENVIRONMENT: development           # Set ENVIRONMENT arg to 'development' for development build
+    image: ${APP_IMAGE}                   # Docker image name from .env
+    working_dir: ${APP_WORKDIR}               # Set working directory inside the container
+    volumes:                            # Mount volumes for code and dependencies
+      - ./laravel:/var/www/html          # Mount local 'laravel' directory to container
+    container_name: ${APP_SERVICE_NAME}   # Container name from .env
+    ports:
+      - "${APP_PORT}:9000"                # Map host APP_PORT to container port 9000
+    depends_on:
+      - mysql                             # Ensure 'mysql' service starts before this
+    
+  nginx:
+    image: nginx:alpine                          # Use lightweight Alpine version of Nginx
+    container_name: ${NGINX_SERVICE_NAME}        # Set container name using .env variable
+    ports:
+      - "${NGINX_PORT}:80"                       # Map host NGINX_PORT to container port 80
+    volumes:
+      - ./laravel:/var/www/html                  # Mount Laravel code into Nginx container
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf  # Mount custom Nginx configs into container
+    depends_on:
+      - app                                      # Wait for Laravel app service to start first
+
+  mysql:                                   # Define a MySQL service
+    image: mysql:8.0                       # Use the official MySQL 8.0 Docker image
+    container_name: ${MYSQL_SERVICE_NAME}  # Name the container using an environment variable
+
+    environment:                           # Define environment variables for MySQL
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Root password for MySQL
+      MYSQL_DATABASE: ${MYSQL_DATABASE}            # Default database to create
+      MYSQL_USER: ${MYSQL_USER}                    # Username for MySQL
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}            # Password for the above user
+
+    volumes:                               # Define persistent storage for MySQL data
+      - db_data:/var/lib/mysql             # Map volume 'db_data' to MySQL data directory
+
+    ports:                                 # Map ports between host and container
+      - "${MYSQL_PORT}:3306"               # Use environment variable for host port to connect MySQL
+
+volumes:                                 # Define Docker named volumes
+  db_data:                               # Declare the volume used above
+
