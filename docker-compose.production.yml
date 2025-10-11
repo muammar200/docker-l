@@ -26,7 +26,7 @@ services:
       - mysql                             # Ensure 'mysql' service starts before this
     
   nginx:
-    image: ghcr.io/muammar200/docker-l/laravel-nginx-dev:latest  # Use the Nginx image pushed to GHCR
+    image: ghcr.io/muammar200/docker-l/laravel-nginx:latest  # Use the Nginx image pushed to GHCR
     container_name: ${NGINX_SERVICE_NAME}        # Set container name using .env variable
     ports:
       - "${NGINX_PORT}:80"                       # Map host NGINX_PORT to container port 80
