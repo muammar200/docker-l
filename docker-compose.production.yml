@@ -1,12 +1,24 @@
 # image settings for containers
 services:
   app:                                    # Define the "app" service (Laravel app)
+    image: ghcr.io/muammar200/docker-l/app:latest  # Use the image pushed to GHCR
+    # based env laravel
+    environment:                       # Set environment variables for the container
+      APP_ENV: ${APP_ENV}                  
+      APP_DEBUG: ${APP_DEBUG}
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL}
+      DB_CONNECTION: ${DB_CONNECTION}
+      DB_HOST: ${DB_HOST}      
+      DB_PORT: ${DB_PORT}                  
+      DB_DATABASE: ${DB_DATABASE}       
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     build:                                # Instructions to build the Docker image
       context: .                          # Use current directory as context
       dockerfile: docker/php/Dockerfile  # Dockerfile location to build the image
       args:                           # Build arguments to pass to Dockerfile
         ENVIRONMENT: production           # Set ENVIRONMENT arg to 'production' for production build
-    image: ${APP_IMAGE}                   # Docker image name from .env
     container_name: ${APP_SERVICE_NAME}   # Container name from .env
     ports:
       - "${APP_PORT}:9000"                # Map host APP_PORT to container port 9000
@@ -14,12 +26,10 @@ services:
       - mysql                             # Ensure 'mysql' service starts before this
     
   nginx:
-    image: nginx:alpine                          # Use lightweight Alpine version of Nginx
+    image: ghcr.io/muammar200/docker-l/laravel-nginx-dev:latest  # Use the Nginx image pushed to GHCR
     container_name: ${NGINX_SERVICE_NAME}        # Set container name using .env variable
     ports:
       - "${NGINX_PORT}:80"                       # Map host NGINX_PORT to container port 80
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf  # Mount custom Nginx configs into container
     depends_on:
       - app                                      # Wait for Laravel app service to start first
 
