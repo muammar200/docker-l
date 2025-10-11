@@ -1,54 +1,51 @@
-# image settings for containers
 services:
-  app:                                    # Define the "app" service (Laravel app)
-    image: ghcr.io/muammar200/docker-l/app:latest  # Use the image pushed to GHCR
-    # based env laravel
-    environment:                       # Set environment variables for the container
-      APP_ENV: ${APP_ENV}                  
+  app:
+    image: ghcr.io/muammar200/docker-l/app:latest
+    environment:
+      APP_ENV: ${APP_ENV}
       APP_DEBUG: ${APP_DEBUG}
       APP_KEY: ${APP_KEY}
       APP_URL: ${APP_URL}
       DB_CONNECTION: ${DB_CONNECTION}
-      DB_HOST: ${DB_HOST}      
-      DB_PORT: ${DB_PORT}                  
-      DB_DATABASE: ${DB_DATABASE}       
+      DB_HOST: ${DB_HOST}     
+      DB_PORT: ${DB_PORT}                 
+      DB_DATABASE: ${DB_DATABASE}      
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-    build:                                # Instructions to build the Docker image
-      context: .                          # Use current directory as context
-      dockerfile: docker/php/Dockerfile  # Dockerfile location to build the image
-      args:                           # Build arguments to pass to Dockerfile
-        ENVIRONMENT: production           # Set ENVIRONMENT arg to 'production' for production build
-    container_name: ${APP_SERVICE_NAME}   # Container name from .env
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        ENVIRONMENT: production
+    container_name: ${APP_SERVICE_NAME}
     ports:
-      - "${APP_PORT}:9000"                # Map host APP_PORT to container port 9000
+      - "${APP_PORT}:9000"
     depends_on:
-      - mysql                             # Ensure 'mysql' service starts before this
+      - mysql
     
   nginx:
-    image: ghcr.io/muammar200/docker-l/laravel-nginx:latest  # Use the Nginx image pushed to GHCR
-    container_name: ${NGINX_SERVICE_NAME}        # Set container name using .env variable
+    image: ghcr.io/muammar200/docker-l/laravel-nginx:latest
+    container_name: ${NGINX_SERVICE_NAME}
     ports:
-      - "${NGINX_PORT}:80"                       # Map host NGINX_PORT to container port 80
+      - "${NGINX_PORT}:80"
     depends_on:
-      - app                                      # Wait for Laravel app service to start first
+      - app
 
-  mysql:                                   # Define a MySQL service
-    image: mysql:8.0                       # Use the official MySQL 8.0 Docker image
-    container_name: ${MYSQL_SERVICE_NAME}  # Name the container using an environment variable
+  mysql:
+    image: mysql:8.0
+    container_name: ${MYSQL_SERVICE_NAME}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
-    environment:                           # Define environment variables for MySQL
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Root password for MySQL
-      MYSQL_DATABASE: ${MYSQL_DATABASE}            # Default database to create
-      MYSQL_USER: ${MYSQL_USER}                    # Username for MySQL
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}            # Password for the above user
+    volumes:
+      - db_data:/var/lib/mysql
 
-    volumes:                               # Define persistent storage for MySQL data
-      - db_data:/var/lib/mysql             # Map volume 'db_data' to MySQL data directory
+    ports:
+      - "${MYSQL_PORT}:3306"
 
-    ports:                                 # Map ports between host and container
-      - "${MYSQL_PORT}:3306"               # Use environment variable for host port to connect MySQL
-
-volumes:                                 # Define Docker named volumes
-  db_data:                               # Declare the volume used above
+volumes:
+  db_data:
 
