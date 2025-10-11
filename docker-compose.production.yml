@@ -7,9 +7,9 @@ services:
       APP_KEY: ${APP_KEY}
       APP_URL: ${APP_URL}
       DB_CONNECTION: ${DB_CONNECTION}
-      DB_HOST: ${DB_HOST}     
-      DB_PORT: ${DB_PORT}                 
-      DB_DATABASE: ${DB_DATABASE}      
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     build:
@@ -22,7 +22,7 @@ services:
       - "${APP_PORT}:9000"
     depends_on:
       - mysql
-    
+
   nginx:
     image: ghcr.io/muammar200/docker-l/laravel-nginx:latest
     container_name: ${NGINX_SERVICE_NAME}
@@ -48,4 +48,3 @@ services:
 
 volumes:
   db_data:
-
