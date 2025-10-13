@@ -1,5 +1,6 @@
 # default environment variable = development
-ARG ENVIRONMENT=development
+# ARG ENVIRONMENT=development
+ARG ENVIRONMENT=production
 
 #****************************************************************************************************************************************************
 #1. Base Image
